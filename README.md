@@ -1,3 +1,5 @@
+[![Get it on Flathub](https://flathub.org/api/badge?svg&locale=en)](https://flathub.org/apps/ca.vtrlx.Telepipe)
+
 ![telepipe screenshot](telepipe.png)
 
 # Telepipe
@@ -12,6 +14,12 @@ Despite appearances, Telepipe is **not a terminal**. This means that TUI apps wi
 
 Telepipe's name is a portmanteau of *teletypewriter* (or *teletype*), a device which in this context allows its user to run a command-line shell from a physical typewriter, and *pipe*, a common command-line feature on UNIX and UNIX-like systems which allows the output of one command to be used as the input of another commnand. Pipelines are an especially powerful way to leverage command-line applications for advanced text processing, and Telepipe's core feature for facilitating their use is [clipboard redirection](https://github.com/vtrlx/telepipe/blob/trunk/docs/Clipboard%20Redirection.md), which allows commands to easily read from and write to the system clipboard.
 
+## Installing
+
+The recommended way to install Telepipe is through [Flathub](https://flathub.org/apps/ca.vtrlx.Telepipe).
+
+Alternatively, Telepipe can be built and installed locally from source.
+
 ## Building
 
 Telepipe is built using Flatpak and targets version 49 of the GNOME platform. With Flatpak installed and Flathub enabled as a source, ensure the platform and SDK are installed to your system:
@@ -20,21 +28,13 @@ Telepipe is built using Flatpak and targets version 49 of the GNOME platform. Wi
 flatpak --user install org.gnome.Platform//49 org.gnome.Sdk//49
 ```
 
-To build and install Telepipe from source, use [Flatpak Builder](https://docs.flatpak.org/en/latest/flatpak-builder.html). Clone this repository, navigate to it in a command-line shell, then run:
-
-```sh
-flatpak-builder build ca.vtrlx.Telepipe.json --user --install --force-clean
-```
-
-After installing, run Telepipe either from your system's app menu or using the command `flatpak run ca.vtrlx.Telepipe`.
-
-If you've made changes to Telepipe, it's advised to test them by building and installing under the development application ID in order to preserve the unmodified Telepipe.
+To build and install the development version of Telepipe from source, use [Flatpak Builder](https://docs.flatpak.org/en/latest/flatpak-builder.html). Clone this repository, navigate to it in a command-line shell, then run:
 
 ```sh
 flatpak-builder build ca.vtrlx.Telepipe.Devel.json --user --install --force-clean
 ```
 
-Test your changes with `flatpak run ca.vtrlx.Telepipe.Devel` or by selecting it from the app menu.
+After installing, run Telepipe either from your system's app menu or using the command `flatpak run ca.vtrlx.Telepipe.Devel`.
 
 ## Features
 
