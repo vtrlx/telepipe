@@ -680,10 +680,14 @@ function runner:chdir(path)
 end
 
 function runner:showfolder()
-	local launcher = Gtk.FileLauncher.new(Gio.File.new_for_path(self.pwd))
-	Gio.Async.start(function()
-		launcher:async_launch()
-	end)() -- Call wrapped async context.
+	local launcher = Gio.SubprocessLauncher.new { "STDOUT_SILENCE", "STDERR_SILENCE" }
+	local subproc = launcher:spawnv {
+		"flatpak-spawn",
+		"--host",
+		"--watch-bus",
+		"/usr/bin/xdg-open",
+		self.pwd,
+	}
 end
 
 function runner:putstring(text)
