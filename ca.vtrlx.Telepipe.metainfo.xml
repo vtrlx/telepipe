@@ -12,6 +12,13 @@
 	<content_rating type="oars-1.1" />
 
 	<releases>
+		<release version="1.1" date="2026-03-17">
+			<description>
+				<p>A Brazilian Portuguese translation has been added.</p>
+				<p>Fixes a bug preventing Telepipe from opening the current working directory in the file manager.</p>
+				<p>Fixes a bug where the file picker would enter incorrect text for filenames containing special characters.</p>
+			</description>
+		</release>
 		<release version="1.0" date="2026-02-23">
 			<description>
 				<p>Initial release.</p>
@@ -68,6 +75,7 @@
 	</description>
 
 	<launchable type="desktop-id">ca.vtrlx.Telepipe.desktop</launchable>
+
 	<screenshots>
 		<screenshot type="default">
 			<image>https://www.vtrlx.ca/images/telepipe/flathub-1.png</image>
