@@ -115,6 +115,7 @@ app:add_main_option("new-window", string.byte "n", "IN_MAIN", "NONE", "Create a 
 local accels = {
 	["win.focus-cmdbar"] = { "<Ctrl>K" },
 	["win.new-tab"] = { "<Ctrl>T" },
+	["win.dup-tab"] = { "<Ctrl><Shift>T" },
 	["win.close-tab"] = { "<Ctrl>W" },
 	["win.new-win"] = { "<Ctrl>N" },
 	["win.overview"] = { "<Ctrl><Shift>O" },
@@ -263,7 +264,7 @@ runnermenu:append(_ "Close Command Input", "win.signal-endinput")
 runnermenu:append(_ "Send to Background", "win.signal-background")
 
 local runner = lib.newclass(function(self, params)
-	assert(params)
+	if type(params) ~= "table" then params = {} end
 	self.env = {}
 	self.pwd = params.pwd or os.getenv "HOME"
 	self.outputqueue = ""
@@ -274,9 +275,20 @@ local runner = lib.newclass(function(self, params)
 		on_teardown = function(_, ...) self:teardownitem(...) end,
 	}
 	self.prefix = params.prefix or ""
-	self.history = {
-		[self.prefix] = Gtk.StringList(),
-	}
+	if not params.history then
+		self.history = {
+			[self.prefix] = Gtk.StringList(),
+		}
+	else
+		self.history = {}
+		for prefix, list in pairs(params.history) do
+			self.history[prefix] = Gtk.StringList()
+			for i = 1, list.n_items do
+				local index = i - 1
+				self.history[prefix]:append(list:get_string(index))
+			end
+		end
+	end
 	self.listitems = {}
 	self.histview = Gtk.ListView {
 		valign = "END",
@@ -299,11 +311,6 @@ local runner = lib.newclass(function(self, params)
 		wrap_mode = Gtk.WrapMode.WORD_CHAR,
 	}
 	self.buffer = self.textview.buffer
-	function self.buffer.on_changed()
-		if self.searchbar.search_mode_enabled then
-			self:findall(self.searchentry.text)
-		end
-	end
 	self.scrolledwin = Gtk.ScrolledWindow {
 		child = self.textview,
 		hscrollbar_policy = "NEVER",
@@ -335,6 +342,10 @@ local runner = lib.newclass(function(self, params)
 			self.doscroll = true
 		end
 		oldupper = upper
+	end
+
+	if params.buffer then
+		self.buffer.text = params.buffer.text
 	end
 
 	-- Search
@@ -418,6 +429,11 @@ local runner = lib.newclass(function(self, params)
 		show_close_button = true,
 	}
 	self.searchbar:connect_entry(self.searchentry)
+	function self.buffer.on_changed()
+		if self.searchbar.search_mode_enabled then
+			self:findall(self.searchentry.text)
+		end
+	end
 	self.chdirbutton = Gtk.Button {
 		action_name = "win.chdir",
 		icon_name = "tp-folder-symbolic",
@@ -448,7 +464,7 @@ local runner = lib.newclass(function(self, params)
 	self.historybutton = Gtk.MenuButton {
 		tooltip_text = _ "Command history",
 		icon_name = "tp-history-symbolic",
-		visible = false,
+		visible = self.history[self.prefix].n_items > 0,
 		direction = "UP",
 		popover = Gtk.Popover {
 			halign = "END",
@@ -532,13 +548,6 @@ local runner = lib.newclass(function(self, params)
 		bottom_bars = { self.searchbar, box },
 	}
 	runners[self.toolbarview] = self
-
-	if self.pwd ~= os.getenv "HOME" then
-		self:inserthistory("cd " .. self:getpwdlabel())
-	end
-	if #self.prefix > 0 then
-		self:inserthistory("prefix " .. self.prefix)
-	end
 end)
 
 function runner:doactivate()
@@ -1490,6 +1499,7 @@ local function shortcuts(parent)
 		Adw.ShortcutsSection {
 			title = _ "Telepipe Window",
 			cut(_ "New Tab", "win.new-tab"),
+			cut(_ "Duplicate Tab", "win.dup-tab"),
 			cut(_ "New Window", "win.new-win"),
 			cut(_ "Open Tab Switcher", "win.overview"),
 			cut(_ "Open Preferences Dialog", "win.preferences"),
@@ -1788,6 +1798,10 @@ window = lib.newclass(function(self)
 		self:newtab()
 	end)
 
+	self:addnewaction("dup-tab", function()
+		self:duptab()
+	end)
+
 	self:addnewaction("new-win", function()
 		local win = window()
 		win:newtab()
@@ -1833,6 +1847,13 @@ function window:addnewaction(name, cb)
 end
 
 function window:newtab()
+	local r = runner()
+	r.tabpage = self.tabview:append(r.toolbarview)
+	self.tabview:set_selected_page(r.tabpage)
+end
+
+-- Doesn't actually "duplicate" a tab, just opens a new one in the present working directory with the current prefix.
+function window:duptab()
 	local params = {}
 	local selected = self.tabview.selected_page
 	local position = 0
@@ -1840,6 +1861,8 @@ function window:newtab()
 		local current = runners[selected.child]
 		params.pwd = current.pwd
 		params.prefix = current.prefix
+		params.history = current.history
+		params.buffer = current.buffer
 		position = 1 + self.tabview:get_page_position(selected)
 	end
 	local r = runner(params)
