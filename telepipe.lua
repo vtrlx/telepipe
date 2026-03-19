@@ -1968,10 +1968,17 @@ function window:overview()
 	for i = 1, self.tabview.n_pages do
 		local index = i - 1
 		local page = self.tabview:get_nth_page(index)
+		local indexlabel = Gtk.Label {
+			label = ("%d"):format(i),
+			extra_css_classes = { "numeric" },
+			width_request = 30,
+			xalign = 1,
+		}
 		local switchbutton = Gtk.Button {
 			extra_css_classes = { "flat" },
 			icon_name = "tp-rerun-symbolic",
 			tooltip_text = _ "Switch to this tab",
+			margin_end = 8,
 			valign = "CENTER",
 			on_clicked = function()
 				self.tabview.selected_page = page
@@ -1979,10 +1986,11 @@ function window:overview()
 			end,
 		}
 		local r = runners[page.child]
-		local title, subtitle = r:gettitle()
+		local title, subtitle, pretty = r:gettitle()
 		table.insert(tabs, Adw.ActionRow {
-			title = title or subtitle,
-			subtitle = title and subtitle or "",
+			title = title or pretty,
+			subtitle = (title and subtitle) or "",
+			prefixes = { indexlabel },
 			suffixes = { switchbutton },
 			selectable = false,
 			activatable = true,
