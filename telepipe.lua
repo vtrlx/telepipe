@@ -1530,6 +1530,11 @@ local function about(parent)
 		developer_name = "Victoria Lacroix",
 		issue_url = "https://github.com/vtrlx/telepipe/issues/new",
 		license_type = "GPL_3_0",
+		release_notes = [[
+<p>New tabs are now always opened in the Home directory with no active prefix, and are placed at the end of the tab list.</p>
+<p>The ability to duplicate a tab has been added. From the original tab, duplicated tabs retain the current working directory, the active prefix (if set), all command output, and all command history, and are placed in the tab list just after the original.</p>
+<p>The tab overview now also displays each tab's index number and active prefix (if set), making it easier to differentiate between tabs and select the desired one.</p>
+]],
 		release_notes_version = lib.get_app_ver(),
 		translator_credits = _ "translator-credits",
 		version = lib.get_app_ver(),
