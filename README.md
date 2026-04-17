@@ -1,3 +1,9 @@
+# [MOVED TO CODEBERG](https://codeberg.org/vtrlx/telepipe)
+
+Development of Telepipe continues [in its Codeberg repository](https://codeberg.org/vtrlx/telepipe). Please submit issues and pull requests there.
+
+---
+
 [![Get it on Flathub](https://flathub.org/api/badge?svg&locale=en)](https://flathub.org/apps/ca.vtrlx.Telepipe)
 
 ![telepipe screenshot](telepipe.png)
